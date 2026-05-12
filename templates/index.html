@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survival Guide — El Reto Móvil</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #070b10;
+    --panel:     #0d1520;
+    --border:    #1a3a5c;
+    --accent:    #00d4ff;
+    --accent2:   #ff6b35;
+    --green:     #00ff88;
+    --yellow:    #ffd700;
+    --text:      #c8dff0;
+    --muted:     #5a7a9a;
+    --locked:    #1a2030;
+    --locked-t:  #2a3a50;
+    --glow:      0 0 20px rgba(0,212,255,.25);
+    --glow2:     0 0 20px rgba(255,107,53,.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === SCANLINE OVERLAY === */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.04) 2px, rgba(0,0,0,.04) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* === HEADER === */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(0,212,255,.05) 0%, transparent 100%);
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+  .logo span { color: var(--accent2); }
+
+  .header-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .status-bar {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .status-bar .alive { color: var(--green); }
+
+  /* === LAYOUT === */
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 70px);
+  }
+
+  /* === SIDEBAR NAV === */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    background: rgba(13,21,32,.6);
+  }
+
+  .sidebar-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    padding: 0 24px 16px;
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all .2s;
+    position: relative;
+  }
+
+  .nav-item:hover:not(.locked) { background: rgba(0,212,255,.05); }
+
+  .nav-item.active {
+    border-left-color: var(--accent);
+    background: rgba(0,212,255,.08);
+  }
+
+  .nav-item.locked {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  .nav-icon { font-size: 20px; min-width: 24px; text-align: center; }
+
+  .nav-text { flex: 1; }
+  .nav-text .nav-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .nav-text .nav-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .nav-status {
+    font-size: 14px;
+  }
+
+  .nav-item.locked .nav-text .nav-name { color: var(--locked-t); }
+
+  .progress-bar-wrap {
+    padding: 24px 24px 0;
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .progress-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 2px;
+    transition: width .5s ease;
+  }
+  .progress-pct {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 6px;
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 20px 24px 0;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: all .2s;
+  }
+  .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* === MAIN CONTENT === */
+  main {
+    padding: 40px 48px;
+    max-width: 900px;
+  }
+
+  /* === SECTION PANEL === */
+  .section-panel { display: none; animation: fadeIn .4s ease; }
+  .section-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* === WELCOME === */
+  .welcome {
+    margin-bottom: 40px;
+  }
+  .welcome-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .welcome-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .welcome-title .icon { font-size: 36px; margin-right: 8px; }
+  .welcome-desc {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 600px;
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+
+  /* === CONTENT BLOCKS === */
+  .content-blocks { margin-bottom: 40px; }
+
+  .block {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .block-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .block-title::before {
+    content: '//';
+    color: var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+
+  .block ul { list-style: none; }
+  .block ul li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(26,58,92,.5);
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .block ul li:last-child { border-bottom: none; }
+  .block ul li::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 12px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  /* === TIMELINE SPECIAL === */
+  .timeline-items { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tl-card {
+    background: rgba(0,212,255,.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .tl-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .tl-label {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* === QUIZ === */
+  .quiz-section {
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--glow);
+  }
+
+  .quiz-header {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiz-header::before { content: '[ '; } .quiz-header::after { content: ' ]'; }
+
+  .question { margin-bottom: 24px; }
+  .question-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .question-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 14px;
+  }
+  .option:hover { border-color: var(--accent); background: rgba(0,212,255,.05); }
+  .option.selected { border-color: var(--accent); background: rgba(0,212,255,.1); }
+  .option.correct  { border-color: var(--green); background: rgba(0,255,136,.1); color: var(--green); }
+  .option.wrong    { border-color: var(--accent2); background: rgba(255,107,53,.1); color: var(--accent2); }
+
+  .option input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0; }
+
+  .quiz-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #33ddff; box-shadow: var(--glow); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* === QUIZ FEEDBACK === */
+  .quiz-result {
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    margin-top: 14px;
+    display: none;
+  }
+  .quiz-result.success {
+    border: 1px solid var(--green);
+    background: rgba(0,255,136,.06);
+    color: var(--green);
+    display: block;
+  }
+  .quiz-result.fail {
+    border: 1px solid var(--accent2);
+    background: rgba(255,107,53,.06);
+    color: var(--accent2);
+    display: block;
+  }
+
+  /* === CHECKPOINT === */
+  .checkpoint {
+    background: var(--panel);
+    border: 1px solid var(--yellow);
+    border-radius: 8px;
+    padding: 24px 28px;
+    display: none;
+    box-shadow: 0 0 20px rgba(255,215,0,.15);
+    animation: pulseGlow 2s ease-in-out infinite alternate;
+  }
+  .checkpoint.visible { display: block; }
+
+  @keyframes pulseGlow {
+    from { box-shadow: 0 0 10px rgba(255,215,0,.1); }
+    to   { box-shadow: 0 0 30px rgba(255,215,0,.25); }
+  }
+
+  .checkpoint-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 10px;
+  }
+  .checkpoint-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .checkpoint-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .checkpoint-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--yellow);
+    cursor: pointer;
+  }
+
+  /* === COMPLETE MESSAGE === */
+  .complete-msg {
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .complete-msg .big-icon { font-size: 64px; margin-bottom: 20px; }
+  .complete-msg h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+  .complete-msg p { color: var(--muted); font-size: 15px; line-height: 1.7; }
+
+  /* === LOCKED OVERLAY === */
+  .locked-overlay {
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--muted);
+  }
+  .locked-overlay .lock-icon { font-size: 48px; margin-bottom: 16px; opacity: .5; }
+  .locked-overlay h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
+    main { padding: 24px 20px; }
+    .welcome-title { font-size: 28px; }
+    .timeline-items { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">Survival Guide</div>
+  <div class="status-bar">
+    PROG. MÓVIL — 204<br>
+  </div>
+</header>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-label">// Navegación</div>
+
+    {% for key in orden %}
+      {% set s = sections[key] %}
+      <div class="nav-item locked" id="nav-{{ s.id }}" onclick="navigateTo('{{ s.id }}')">
+        <div class="nav-icon">{{ s.icono }}</div>
+        <div class="nav-text">
+          <div class="nav-name">{{ s.titulo }}</div>
+          <div class="nav-sub">ZONA {{ loop.index }}</div>
+        </div>
+        <div class="nav-status" id="navstat-{{ s.id }}"></div>
+      </div>
+    {% endfor %}
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label">// Progreso</div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="progress-pct" id="prog-pct">0%</div>
+    </div>
+
+    <button class="reset-btn" onclick="resetProgress()">↺ Reiniciar</button>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- PANTALLA INTRO -->
+    <div class="section-panel active" id="panel-intro">
+      <div class="welcome">
+        <div class="welcome-eyebrow">// Bienvenido, Estudiante</div>
+        <div class="welcome-title">El Reto Móvil</div>
+        <div class="welcome-desc">
+          Acabas de entrar a la materia de <strong>Programación Móvil</strong>. Tu misión: desbloquear cada zona respondiendo correctamente las preguntas y aceptando tu compromiso. La primera zona ya está abierta. ¡Buena suerte, sobreviviente!
+        </div>
+      </div>
+      <div style="margin-top:32px;">
+        <button class="btn btn-primary" onclick="navigateTo('reglas')">▸ Comenzar la aventura</button>
+      </div>
+    </div>
+
+    <!-- SECCIONES DINÁMICAS -->
+    {% for key in orden %}
+      {% set s = sections[key] %}
+      <div class="section-panel" id="panel-{{ s.id }}">
+
+        <!-- Contenido bloqueado -->
+        <div class="locked-overlay" id="locked-{{ s.id }}" style="display:none;">
+          <div class="lock-icon"></div>
+          <h2>Zona Bloqueada</h2>
+          <p>Debes completar la zona anterior primero.</p>
+        </div>
+
+        <!-- Contenido desbloqueado -->
+        <div id="content-{{ s.id }}">
+          <div class="welcome">
+            <div class="welcome-eyebrow">// Zona {{ loop.index }} de 4</div>
+            <div class="welcome-title"><span class="icon">{{ s.icono }}</span>{{ s.titulo }}</div>
+            <div class="welcome-desc">{{ s.descripcion }}</div>
+          </div>
+
+          <div class="content-blocks">
+            {% for bloque in s.contenido %}
+            <div class="block">
+              <div class="block-title">{{ bloque.subtitulo }}</div>
+              <ul>
+                {% for item in bloque.puntos %}
+                <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- QUIZ -->
+          <div class="quiz-section" id="quiz-{{ s.id }}">
+            <div class="quiz-header">CHECKPOINT — QUIZ DE COMPRENSIÓN</div>
+
+            {% for pregunta in s.preguntas %}
+            <div class="question" id="qblock-{{ pregunta.id }}">
+              <div class="question-num">PREGUNTA {{ loop.index }} / {{ s.preguntas|length }}</div>
+              <div class="question-text">{{ pregunta.texto }}</div>
+              <div class="options">
+                {% for i, opcion in pregunta.opciones|enumerate %}
+                <label class="option" id="opt-{{ pregunta.id }}-{{ i }}">
+                  <input type="radio" name="{{ pregunta.id }}" value="{{ i }}" onchange="selectOption('{{ pregunta.id }}', {{ i }})">
+                  {{ opcion }}
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+
+            <div class="quiz-actions">
+              <button class="btn btn-primary" id="btn-verificar-{{ s.id }}" onclick="verificarQuiz('{{ s.id }}')" disabled>
+                ▸ Verificar respuestas
+              </button>
+              <button class="btn btn-secondary" onclick="reiniciarQuiz('{{ s.id }}')">↺ Limpiar</button>
+            </div>
+
+            <div class="quiz-result" id="result-{{ s.id }}"></div>
+          </div>
+
+          <!-- CHECKPOINT COMPROMISO -->
+          <div class="checkpoint" id="checkpoint-{{ s.id }}">
+            <div class="checkpoint-title"> Check de Compromiso</div>
+            <div class="checkpoint-desc">¡Excelente! Has demostrado que entiendes esta zona. Ahora acepta tu compromiso para desbloquear la siguiente área.</div>
+            <label class="checkpoint-label">
+              <input type="checkbox" id="check-{{ s.id }}" onchange="comprometerse('{{ s.id }}', this.checked)">
+              Me comprometo a cumplir con todo lo establecido en esta sección durante el semestre.
+            </label>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+
+    <!-- PANEL FINAL -->
+    <div class="section-panel" id="panel-final">
+      <div class="complete-msg">
+        <div class="big-icon"></div>
+        <h2>¡Misión Completada!</h2>
+        <p>
+          Has desbloqueado todas las zonas del Survival Guide.<br>
+          Conoces las reglas, el sistema de evaluación, las tecnologías que aprenderás<br>
+          y las fechas clave. <strong style="color:var(--green);">Estás listo para sobrevivir el Reto Móvil.</strong><br><br>
+         
+        </p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ── estado global ──────────────────────────────────────────────
+  const ORDEN = {{ orden | tojson }};
+  let desbloqueadas = [];
+  let respuestasSeleccionadas = {};
+  let quizCompletado = {};
+
+  // ── init ───────────────────────────────────────────────────────
+  async function init() {
+    const r = await fetch('/api/estado');
+    const data = await r.json();
+    desbloqueadas = data.desbloqueadas;
+    actualizarNav();
+    navigateTo('reglas');
+  }
+
+  // ── navegación ─────────────────────────────────────────────────
+  function navigateTo(id) {
+    if (id !== 'intro' && !desbloqueadas.includes(id)) return;
+
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    const panel = document.getElementById('panel-' + id);
+    if (panel) panel.classList.add('active');
+
+    const nav = document.getElementById('nav-' + id);
+    if (nav) nav.classList.add('active');
+
+    // Mostrar contenido correcto dentro del panel
+    if (id !== 'intro' && id !== 'final') {
+      const locked = document.getElementById('locked-' + id);
+      const content = document.getElementById('content-' + id);
+      if (desbloqueadas.includes(id)) {
+        if (locked) locked.style.display = 'none';
+        if (content) content.style.display = 'block';
+      } else {
+        if (locked) locked.style.display = 'block';
+        if (content) content.style.display = 'none';
+      }
+    }
+  }
+
+  function actualizarNav() {
+    ORDEN.forEach((id, i) => {
+      const nav = document.getElementById('nav-' + id);
+      const stat = document.getElementById('navstat-' + id);
+      if (desbloqueadas.includes(id)) {
+        nav.classList.remove('locked');
+        if (quizCompletado[id]) {
+          stat.textContent = '';
+        } else {
+          stat.textContent = '▸';
+        }
+      } else {
+        nav.classList.add('locked');
+        stat.textContent = '';
+      }
+    });
+
+    const pct = Math.round((desbloqueadas.length / ORDEN.length) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-pct').textContent = pct + '% completado';
+  }
+
+  // ── quiz ───────────────────────────────────────────────────────
+  function selectOption(pid, val) {
+    if (!respuestasSeleccionadas[pid]) respuestasSeleccionadas[pid] = {};
+    respuestasSeleccionadas[pid] = val;
+
+    // Highlight seleccionada
+    const opciones = document.querySelectorAll(`[id^="opt-${pid}-"]`);
+    opciones.forEach(o => o.classList.remove('selected'));
+    document.getElementById(`opt-${pid}-${val}`).classList.add('selected');
+
+    // Verificar si todas las preguntas de esta sección tienen respuesta
+    const panel = document.getElementById('panel-' + getCurrentSeccion());
+    if (!panel) return;
+    const radios = panel.querySelectorAll('input[type="radio"]');
+    const grupos = new Set([...radios].map(r => r.name));
+    const respondidas = [...grupos].every(g => respuestasSeleccionadas[g] !== undefined);
+
+    const btn = panel.querySelector('[id^="btn-verificar-"]');
+    if (btn) btn.disabled = !respondidas;
+  }
+
+  function getCurrentSeccion() {
+    const active = document.querySelector('.nav-item.active');
+    if (!active) return null;
+    return active.id.replace('nav-', '');
+  }
+
+  async function verificarQuiz(seccionId) {
+    const panel = document.getElementById('panel-' + seccionId);
+    const radios = panel.querySelectorAll('input[type="radio"]');
+    const grupos = new Set([...radios].map(r => r.name));
+
+    const respuestas = {};
+    grupos.forEach(g => { respuestas[g] = respuestasSeleccionadas[g]; });
+
+    const r = await fetch('/api/verificar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seccion: seccionId, respuestas })
+    });
+    const data = await r.json();
+
+    const resultDiv = document.getElementById('result-' + seccionId);
+
+    // Marcar opciones correctas/incorrectas
+    for (const [pid, res] of Object.entries(data.resultados)) {
+      const seleccionada = respuestasSeleccionadas[pid];
+      const opcionSel = document.getElementById(`opt-${pid}-${seleccionada}`);
+      const opcionCorr = document.getElementById(`opt-${pid}-${res.respuesta_correcta}`);
+
+      if (res.correcta) {
+        if (opcionSel) opcionSel.classList.add('correct');
+      } else {
+        if (opcionSel) opcionSel.classList.add('wrong');
+        if (opcionCorr) opcionCorr.classList.add('correct');
+      }
+    }
+
+    // Deshabilitar inputs
+    panel.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+    panel.querySelector('[id^="btn-verificar-"]').disabled = true;
+
+    if (data.aprobado) {
+      resultDiv.className = 'quiz-result success';
+      resultDiv.textContent = `¡Perfecto! ${data.correctas}/${data.total} correctas. Ahora acepta tu compromiso.`;
+      document.getElementById('checkpoint-' + seccionId).classList.add('visible');
+      quizCompletado[seccionId] = true;
+      actualizarNav();
+    } else {
+      resultDiv.className = 'quiz-result fail';
+      resultDiv.textContent = `✗ ${data.correctas}/${data.total} correctas. Revisa el contenido y vuelve a intentarlo.`;
+      setTimeout(() => reiniciarQuiz(seccionId), 3000);
+    }
+  }
+
+  function reiniciarQuiz(seccionId) {
+    const panel = document.getElementById('panel-' + seccionId);
+    panel.querySelectorAll('input[type="radio"]').forEach(r => {
+      r.disabled = false;
+      r.checked = false;
+    });
+    panel.querySelectorAll('.option').forEach(o => {
+      o.classList.remove('selected', 'correct', 'wrong');
+    });
+
+    const grupos = new Set([...panel.querySelectorAll('input[type="radio"]')].map(r => r.name));
+    grupos.forEach(g => delete respuestasSeleccionadas[g]);
+
+    const btn = panel.querySelector('[id^="btn-verificar-"]');
+    if (btn) btn.disabled = true;
+
+    const resultDiv = document.getElementById('result-' + seccionId);
+    resultDiv.className = 'quiz-result';
+
+    const checkpoint = document.getElementById('checkpoint-' + seccionId);
+    checkpoint.classList.remove('visible');
+    const cb = document.getElementById('check-' + seccionId);
+    if (cb) cb.checked = false;
+  }
+
+  // ── compromiso ─────────────────────────────────────────────────
+  async function comprometerse(seccionId, checked) {
+    if (!checked) return;
+
+    const r = await fetch('/api/desbloquear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seccion: seccionId })
+    });
+    const data = await r.json();
+    desbloqueadas = data.desbloqueadas;
+    actualizarNav();
+
+    if (data.completado) {
+      setTimeout(() => {
+        document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('panel-final').classList.add('active');
+        document.getElementById('prog-fill').style.width = '100%';
+        document.getElementById('prog-pct').textContent = '100% completado';
+      }, 600);
+    } else if (data.siguiente) {
+      setTimeout(() => navigateTo(data.siguiente), 600);
+    }
+  }
+
+  // ── reset ──────────────────────────────────────────────────────
+  async function resetProgress() {
+    if (!confirm('¿Reiniciar todo el progreso?')) return;
+    await fetch('/api/reset', { method: 'POST' });
+    respuestasSeleccionadas = {};
+    quizCompletado = {};
+    desbloqueadas = ['reglas'];
+    actualizarNav();
+
+    ORDEN.forEach(id => reiniciarQuiz(id));
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-intro').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  }
+
+  // ── Jinja filter helper no disponible, se usa enumerate en template ──
+  init();
+</script>
+
+</body>
+</html>
