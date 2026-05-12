@@ -85,41 +85,33 @@ SECTIONS = {
             {
                 "subtitulo": "Teoría — Evidencias de Conocimiento",
                 "puntos": [
-                    "Actividades numeradas: Actividad 1, 2, … n",
-                    "Investigaciones documentadas",
-                    "Mapas conceptuales y mentales",
-                    "Cuestionarios de comprensión",
-                    "Exposiciones ante el grupo",
+                    "Examamenes parcilaes",
+        
                 ]
             },
             {
                 "subtitulo": "Práctica — Evidencias de Desempeño",
-                "puntos": [
-                    "Prácticas numeradas: Práctica 1, 2, … n",
-                    "Reportes escritos de cada práctica",
-                    "Video reportes demostrando el funcionamiento",
-                    "Evidencias en GitHub: commits y push obligatorios",
-                ]
-            },
-            {
-                "subtitulo": "Producto — Evidencias",
                 "puntos": [
                     "Participación activa en clase",
                     "Trabajos completos subidos a Classroom",
                     "Commits y Push constantes en tu repositorio",
                     "Respeto estricto a los tiempos de entrega",
                     "Calidad universitaria en todo lo entregado",
+                    
                 ]
             },
             {
-                "subtitulo": "Proyecto Integrador",
+                "subtitulo": "Producto — Evidencias",
                 "puntos": [
-                    "Proyecto didáctico de la materia en equipo asignado.",
+                    "Proyecto dictado de la materia",
                     "Incluye temas de la materia + background tecnológico.",
                     "Una entrega formal por parcial.",
-                    "Se recomienda preguntar dudas constantemente al profesor.",
+                    "Se recomienda preguntar dudas constantemente al profesor."
+
+                
                 ]
-            }
+            },
+            
         ],
         "preguntas": [
             {
