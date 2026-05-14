@@ -1,14 +1,5 @@
-/*
-========================================
- CATÁLOGO DE CAFETERÍA
- ESTRUCTURA CON new Object()
-========================================
-*/
 
-
-// ==========================
 // BEBIDAS
-// ==========================
 
 var ExpresAmericano = new Object();
 
@@ -34,9 +25,8 @@ Latte.tamaño = "Grande";
 Latte.disponible = true;
 
 
-// ==========================
+
 // ALIMENTOS
-// ==========================
 
 var SandwichJamon = new Object();
 
@@ -59,9 +49,8 @@ Hamburguesa.precio = 120;
 Hamburguesa.disponible = true;
 
 
-// ==========================
 // PANADERÍA
-// ==========================
+
 
 var Croissant = new Object();
 
@@ -84,46 +73,98 @@ Muffin.precio = 40;
 Muffin.disponible = true;
 
 
-// ==========================
-// CATÁLOGO GENERAL
-// ==========================
+// MENÚ POR SECCIONES
 
-var catalogo = [
+var bebidas = [
     ExpresAmericano,
     Capuccino,
-    Latte,
+    Latte
+];
+
+var alimentos = [
     SandwichJamon,
     EnsaladaCeser,
-    Hamburguesa,
+    Hamburguesa
+];
+
+var panaderia = [
     Croissant,
     DonaChocolate,
     Muffin
 ];
 
 
-// ==========================
-// MOSTRAR PRODUCTOS
-// ==========================
+// CATÁLOGO GENERAL
 
-function mostrarCatalogo() {
+var catalogo = [
 
-    console.log("===== CATÁLOGO =====");
+    ExpresAmericano,
+    Capuccino,
+    Latte,
 
-    catalogo.forEach(function(producto) {
+    SandwichJamon,
+    EnsaladaCeser,
+    Hamburguesa,
+
+    Croissant,
+    DonaChocolate,
+    Muffin
+
+];
+
+
+// MOSTRAR MENÚ
+
+function mostrarMenu() {
+
+    console.log("\n========= MENÚ CAFETERÍA =========");
+
+
+    // BEBIDAS
+    console.log("\n--- BEBIDAS ---");
+
+    bebidas.forEach(function(producto, indice) {
 
         console.log(
-            "Nombre: " + producto.nombre +
-            " | Precio: $" + producto.precio
+            (indice + 1) + ". " +
+            producto.nombre +
+            " - $" + producto.precio
+        );
+
+    });
+
+
+    // ALIMENTOS
+    console.log("\n--- ALIMENTOS ---");
+
+    alimentos.forEach(function(producto, indice) {
+
+        console.log(
+            (indice + 4) + ". " +
+            producto.nombre +
+            " - $" + producto.precio
+        );
+
+    });
+
+
+    // PANADERÍA
+    console.log("\n--- PANADERÍA ---");
+
+    panaderia.forEach(function(producto, indice) {
+
+        console.log(
+            (indice + 7) + ". " +
+            producto.nombre +
+            " - $" + producto.precio
         );
 
     });
 
 }
 
-
-// ==========================
 // AGREGAR PRODUCTO
-// ==========================
+
 
 function agregarProducto(producto) {
 
@@ -133,16 +174,17 @@ function agregarProducto(producto) {
 
 }
 
-
-// ==========================
 // ACTUALIZAR PRODUCTO
-// ==========================
+
 
 function actualizarProducto(nombreProducto, nuevosDatos) {
 
     var producto = catalogo.find(function(item) {
+
         return item.nombre === nombreProducto;
+
     });
+
 
     if (producto) {
 
@@ -159,15 +201,17 @@ function actualizarProducto(nombreProducto, nuevosDatos) {
 }
 
 
-// ==========================
+
 // ELIMINAR PRODUCTO
-// ==========================
 
 function eliminarProducto(nombreProducto) {
 
     var indice = catalogo.findIndex(function(item) {
+
         return item.nombre === nombreProducto;
+
     });
+
 
     if (indice !== -1) {
 
@@ -184,25 +228,48 @@ function eliminarProducto(nombreProducto) {
 }
 
 
-// ==========================
-// EJEMPLOS
-// ==========================
+// MOSTRAR CATÁLOGO
 
-// Mostrar catálogo
+function mostrarCatalogo() {
+
+    console.log("\n========= CATÁLOGO =========");
+
+    catalogo.forEach(function(producto) {
+
+        console.log(
+            "Nombre: " + producto.nombre +
+            " | Precio: $" + producto.precio
+        );
+
+    });
+
+}
+
+
+
+
+
+// MOSTRAR MENÚ
+mostrarMenu();
+
+
+// MOSTRAR CATÁLOGO
 mostrarCatalogo();
 
 
-// Actualizar producto
+// ACTUALIZAR PRODUCTO
 actualizarProducto("Latte", {
+
     precio: 70
+
 });
 
 
-// Eliminar producto
+// ELIMINAR PRODUCTO
 eliminarProducto("Muffin de Vainilla");
 
 
-// Nuevo producto
+// CREAR NUEVO PRODUCTO
 var ChocolateCaliente = new Object();
 
 ChocolateCaliente.nombre = "Chocolate Caliente";
@@ -210,9 +277,9 @@ ChocolateCaliente.precio = 55;
 ChocolateCaliente.disponible = true;
 
 
-// Agregar producto
+// AGREGAR PRODUCTO
 agregarProducto(ChocolateCaliente);
 
 
-// Mostrar catálogo actualizado
+// MOSTRAR CATÁLOGO ACTUALIZADO
 mostrarCatalogo();
