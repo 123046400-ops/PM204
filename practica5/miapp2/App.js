@@ -9,7 +9,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       
-      <Image  source ={require('./assets/wave.png')}/> //Agregamos la imagen a la vista 
+      {/*<Image  source ={require('./assets/wave.png')}/> //Agregamos la imagen a la vista 
 
       <Text>Hola Mundo RN</Text>
       <Text>-----------------------------</Text>
@@ -18,13 +18,16 @@ export default function App() {
       <Saludo/>
       <Text>-----------------------------</Text>
 
-      <Saludo2/>
+      <Saludo2/>*/}
 
-      <Text>-----------------------------</Text>
-      <Perfil nombre="María Guadalupe Jimenéz Ruiz" carrera="ISC" materia="movil" cuatri="9°"/> 
+     {/*} <Text>-----------------------------</Text>*/}
+      <Perfil style={styles.tarjetaVerde} nombre="María Guadalupe Jimenéz Ruiz" carrera="ISC" materia="movil" cuatri="9°"/> 
 
-      <Text>-----------------------------</Text>
-      <Perfil nombre="María Jimenéz Ruiz" carrera="Sistemas " materia="Programación" cuatri="9°"/>
+      {/*<Text>-----------------------------</Text>*/}
+      <Perfil style={styles.tarjetaRoja}nombre="María Jimenéz Ruiz" carrera="Sistemas " materia="Programación" cuatri="9°"/>
+
+      <Perfil style={styles.tarjetaVerde} nombre="Guadalupe Jimenéz Ruiz" carrera="ISC" materia="movil" cuatri="9°"/> 
+
 
       <StatusBar style="auto" />
     </View>
@@ -36,6 +39,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    flexDirection:'row',/* row para cambiar a fila*/ 
+  },
+  tarjetaVerde:{
+    backgroundColor:'#6BCB77',
+  },
+  tarjetaRoja:{
+   backgroundColor:'#FF6B6B',
   },
 });
