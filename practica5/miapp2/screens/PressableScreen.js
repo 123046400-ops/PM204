@@ -1,20 +1,17 @@
 /*Zona1: importaciones componentes y archivos  */
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View,Image} from 'react-native'; //Agremgamos Image
-import MenuScreen from './screens/MenuScreen';
-import{SafeAreaProvider} from 'react-native-safe-area-context'; 
 
 /* Zona2: Main ---Componetes */
-export default function App() {
+export default function PressableScreen() {
   return (
-    <SafeAreaProvider> 
     <View style={styles.container}>
       
-      <MenuScreen></MenuScreen>
+      <Text>Aqui va la practica de PressableScreen view</Text>
+
 
       <StatusBar style="auto" />
     </View>
-    </SafeAreaProvider> 
   );
 }
 /* Zona3: Estilos y Posicionamiento */
