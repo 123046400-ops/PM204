@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Button } from 'react-native';
 import React, { useState } from 'react';
 import TarjetasScreen from './TarjetasScreen';
 import SafeAreaScreen from './SafeAreaScreen';
+import PressableSwitchScreen from './PressableSwitchScreen';
 
 export default function MenuScreen() {
 
@@ -13,6 +14,10 @@ export default function MenuScreen() {
       return <TarjetasScreen />;
     case 'safeAreaScreen':                          
       return <SafeAreaScreen />;
+    case 'ImageBackgroundSplashScreen':
+      return <ImageBackgroundSplashScreen />; 
+    case 'PressableSwitchScreen': 
+      return <PressableSwitchScreen />;  
     case 'menu':
     default:
       return (
@@ -20,7 +25,7 @@ export default function MenuScreen() {
           <Button title='Tarjetas' onPress={() => setScreen('tarjetas')} />
           <Button title='SafeAreaScreen' onPress={() => setScreen('safeAreaScreen')} />
           <Button title='Screen' onPress={() => setScreen('scroll')} />
-          <Button title='Pressable' onPress={() => setScreen('pressable')} />
+          <Button title='PressableSwitchScreen' onPress={() => setScreen('PressableSwitchScreen')} />
           <StatusBar style="auto" />
         </View>
       );
