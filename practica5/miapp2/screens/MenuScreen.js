@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import TarjetasScreen from './TarjetasScreen';
 import SafeAreaScreen from './SafeAreaScreen';
 import PressableSwitchScreen from './PressableSwitchScreen';
+import TextInputAlertScreen from './TextInputAlertScreen';
+
 
 export default function MenuScreen() {
 
@@ -17,7 +19,9 @@ export default function MenuScreen() {
     case 'ImageBackgroundSplashScreen':
       return <ImageBackgroundSplashScreen />; 
     case 'PressableSwitchScreen': 
-      return <PressableSwitchScreen />;  
+      return <PressableSwitchScreen />; 
+    case'TextInputAlertScreen':
+      return <TextInputAlertScreen />;   
     case 'menu':
     default:
       return (
@@ -26,6 +30,7 @@ export default function MenuScreen() {
           <Button title='SafeAreaScreen' onPress={() => setScreen('safeAreaScreen')} />
           <Button title='Screen' onPress={() => setScreen('scroll')} />
           <Button title='PressableSwitchScreen' onPress={() => setScreen('PressableSwitchScreen')} />
+          <Button title='TextInputAlertScreen' onPress={() => setScreen('TextInputAlertScreen')} />
           <StatusBar style="auto" />
         </View>
       );
