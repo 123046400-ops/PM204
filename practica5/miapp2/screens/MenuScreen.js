@@ -5,7 +5,7 @@ import TarjetasScreen from './TarjetasScreen';
 import SafeAreaScreen from './SafeAreaScreen';
 import PressableSwitchScreen from './PressableSwitchScreen';
 import TextInputAlertScreen from './TextInputAlertScreen';
-
+import FlatListSectionListScreen from './FlatListSectionListScreen';
 
 export default function MenuScreen() {
 
@@ -21,7 +21,9 @@ export default function MenuScreen() {
     case 'PressableSwitchScreen': 
       return <PressableSwitchScreen />; 
     case'TextInputAlertScreen':
-      return <TextInputAlertScreen />;   
+      return <TextInputAlertScreen />; 
+    case'FlatListSectionListScreen':
+      return <FlatListSectionListScreen />;   
     case 'menu':
     default:
       return (
@@ -31,6 +33,7 @@ export default function MenuScreen() {
           <Button title='Screen' onPress={() => setScreen('scroll')} />
           <Button title='PressableSwitchScreen' onPress={() => setScreen('PressableSwitchScreen')} />
           <Button title='TextInputAlertScreen' onPress={() => setScreen('TextInputAlertScreen')} />
+         <Button title='FlatListSectionListScreen' onPress={() => setScreen('FlatListSectionListScreen')} />
           <StatusBar style="auto" />
         </View>
       );
